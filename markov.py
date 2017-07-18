@@ -14,7 +14,9 @@ import random
 # 3) Use the Markov Chain to generate a random phrase
 # 4) Output the phrase
 
-## TODO -- 1) get twitter stream working, and 2) use it to find all the tweets w/ trending hashtags
+## TODO -- 1) make sure Cursor method works with Markov chain
+## TODO -- 2) search only for hashtags in English
+## TODO -- 3) make twitter bot tweet the Markov chain message
 
 # To login to my bot's twitter account
 class MyStreamListener(tweepy.StreamListener):
@@ -82,9 +84,7 @@ def generate_message(chain, char_limit=140) :
 
 def run_bot(twitter) :
 
-    contents = ''
-
-    ## Get the current trending topics from twitter
+    # Get the current trending topics from twitter
 
     # trends_place() returns a json object, but tweepy deserializes it for us. trends will be an ordinary Python list
     trends1 = twitter.trends_place(1)
@@ -101,24 +101,47 @@ def run_bot(twitter) :
     # put all the names together into a list
     trendsNames = ' '.join(names).split(' ')
 
+    # Go through a large amount of tweets from all users using a stream listener
 
-    ## Go through a large amount of tweets from all users using a stream listener
+    # ---------- STREAMING METHOD ------------ #
 
-    my_stream_listener = MyStreamListener()
-    my_stream = tweepy.Stream(auth = twitter.auth, listener = my_stream_listener)
+    # my_stream_listener = MyStreamListener()
+    # my_stream = tweepy.Stream(auth = twitter.auth, listener = my_stream_listener)
 
+    # streams all tweets with trending hashtags send out by U.S. accounts
+    # tweets = my_stream.filter(track=trendsNames, async=True, locations=[-169.90, 52.72, -130.53, 72.40,
+                                                                      # -160.6, 18.7, -154.5, 22.3,
+                                                                      #  -124.90, 23.92, -66.37, 50.08])
 
+    # However many seconds the program sleeps will determine how long the stream continues for
+    # time.sleep(5)
+    # my_stream.disconnect()
 
+    # ----------- TWEEPY'S CURSOR METHOD ---------- #
+    tweets = []
+    #page = 1
+    #while page < 10 :
+     #   statuses = twitter.search(q=trendsNames[8])
+      #  if statuses :
+       #     for status in statuses :
+        #        tweets.append(status.text)
+        #else:
+         #   break
+        #page += 1
+
+    for statuses in tweepy.Cursor(twitter.search,q='#PleaseStepIn').items() :
+        tweets.append(statuses.text)
 
     # Generate the Markov chain
-    # chain = generate_chain(contents)
+    chain = generate_chain(' '.join(tweets))
+    print(trendsNames)
 
     # Generate the message using the chain
-    # message = generate_message(chain)
+    message = generate_message(chain)
 
-    # print('The Markov chain: ' + message)
+    print('The Markov chain: ' + message)
 
-    print(trendsNames)
+    # print(trendsNames)
 
     # Bot will tweet once every hour (3,600 seconds)
     time.sleep(10)
