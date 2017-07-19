@@ -15,7 +15,6 @@ import random
 # 4) Output the phrase
 
 ## TODO -- 1) search only for hashtags in English
-## TODO -- 2) figure out what the &amp thing is about
 
 # To login to my bot's twitter account
 
@@ -39,10 +38,7 @@ class MyStreamListener(tweepy.StreamListener):
 def authenticate_twitter() :
     print('Authenticating twitter account...')
 
-    consumer_key = 'icRe9PnxhbXzAfeWxBhjNFdTN'
-    consumer_secret = 'wHULrdZE0ELoHMs0ySmwT41OHe0d2TlHemibcVi8GCuoPpF4Lu'
-    access_token = '701887784303198208-NvPpwavnDqoylOijP8XYOFFXrpYD2Kk'
-    access_token_secret = 'BCkL7jhWH1e0y4weUEKNQd0CIWT4px1xp54sz5juWW6qV'
+    
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
 
@@ -122,11 +118,16 @@ def run_bot(twitter) :
     # grab the trends
     trends = trends_dict['trends']
 
+    #trendsNames = []
     # grab the name of each trend (only hashtags, not people)
-    names = [trend['name'] for trend in trends if trend['name'][0] == '#']
+    trendsNames = [trend['name'] for trend in trends if trend['name'][0] == '#']
+    #for trend in trends :
+        #if trend['name'][0] == '#' :
+            #try :
+                #trendsNames.append(trend['name'].encode('ascii', 'strict'))
+            #except UnicodeError :
+                #print('Hashtag is not in English; discarded.')
 
-    # put all the names together into a list
-    trendsNames = ' '.join(names).split(' ')
     print(trendsNames)
     # Go through a large amount of tweets from all users using a stream listener
 
