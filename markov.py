@@ -14,15 +14,27 @@ import random
 # 3) Use the Markov Chain to generate a random phrase
 # 4) Output the phrase
 
-## TODO -- 1) make sure Cursor method works with Markov chain
 ## TODO -- 2) search only for hashtags in English
-## TODO -- 3) make twitter bot tweet the Markov chain message
+
 
 # To login to my bot's twitter account
+
 class MyStreamListener(tweepy.StreamListener):
     # override tweepy.StreamListener to add logic to on_status
     def on_status(self, status):
         print(status.text)
+
+        # Emojis can't be encoded into .txt file, so only accept tweets without them
+        try :
+            status.text.encode('utf-8','strict')
+            file = open('tweets.txt', 'a')
+            file.write(status.text + '\n')
+        except UnicodeError :
+            print('Tweet contained non UTF-8 chars; deleted.')
+
+
+
+
 
 def authenticate_twitter() :
     print('Authenticating twitter account...')
@@ -67,7 +79,11 @@ def generate_chain(text, chain={}) :
 # To generate the message
 # Character limit of twitter is 140
 
-def generate_message(chain, char_limit=140) :
+
+def generate_message(chain, trendsNames) :
+
+    i = random.randint(0, len(trendsNames))
+    char_limit = 140 - (len(trendsNames[i])+5)
 
     # The first word will be a random key from the Markov chain
     word1 = random.choice(list(chain.keys()))
@@ -79,10 +95,14 @@ def generate_message(chain, char_limit=140) :
         word2 = random.choice(chain[word1])
         word1 = word2
         message += ' ' + word2
+    # add a random trending hashtag to the end of the tweet
+    message += ' ' + trendsNames[i]
 
     return message
 
+
 def run_bot(twitter) :
+    open('tweets.txt', 'w').close()
 
     # Get the current trending topics from twitter
 
@@ -100,51 +120,45 @@ def run_bot(twitter) :
 
     # put all the names together into a list
     trendsNames = ' '.join(names).split(' ')
-
+    print(trendsNames)
     # Go through a large amount of tweets from all users using a stream listener
 
     # ---------- STREAMING METHOD ------------ #
 
-    # my_stream_listener = MyStreamListener()
-    # my_stream = tweepy.Stream(auth = twitter.auth, listener = my_stream_listener)
+    my_stream_listener = MyStreamListener()
+    my_stream = tweepy.Stream(auth = twitter.auth, listener = my_stream_listener)
 
     # streams all tweets with trending hashtags send out by U.S. accounts
-    # tweets = my_stream.filter(track=trendsNames, async=True, locations=[-169.90, 52.72, -130.53, 72.40,
-                                                                      # -160.6, 18.7, -154.5, 22.3,
-                                                                      #  -124.90, 23.92, -66.37, 50.08])
+    my_stream.filter(track=trendsNames, async=True, locations=[-169.90, 52.72, -130.53, 72.40,
+                                                                        -160.6, 18.7, -154.5, 22.3,
+                                                                        -124.90, 23.92, -66.37, 50.08])
 
     # However many seconds the program sleeps will determine how long the stream continues for
-    # time.sleep(5)
-    # my_stream.disconnect()
+    time.sleep(60)
+    my_stream.disconnect()
 
-    # ----------- TWEEPY'S CURSOR METHOD ---------- #
-    tweets = []
-    #page = 1
-    #while page < 10 :
-     #   statuses = twitter.search(q=trendsNames[8])
-      #  if statuses :
-       #     for status in statuses :
-        #        tweets.append(status.text)
-        #else:
-         #   break
-        #page += 1
+    tweets = ''
 
-    for statuses in tweepy.Cursor(twitter.search,q='#PleaseStepIn').items() :
-        tweets.append(statuses.text)
+    with open('tweets.txt', 'r') as file :
+        tweets = file.read()
+
+    print(tweets)
 
     # Generate the Markov chain
-    chain = generate_chain(' '.join(tweets))
-    print(trendsNames)
+    chain = generate_chain(tweets)
+
 
     # Generate the message using the chain
-    message = generate_message(chain)
+    message = generate_message(chain, trendsNames)
 
     print('The Markov chain: ' + message)
 
-    # print(trendsNames)
+    # Tweet out the resulting Markov chain!
 
+    twitter.update_status(message)
+    print('Sleeping for one hour...')
     # Bot will tweet once every hour (3,600 seconds)
-    time.sleep(10)
+    time.sleep(60*20)
 
 twitter = authenticate_twitter()
 
