@@ -14,8 +14,8 @@ import random
 # 3) Use the Markov Chain to generate a random phrase
 # 4) Output the phrase
 
-## TODO -- 2) search only for hashtags in English
-
+## TODO -- 1) search only for hashtags in English
+## TODO -- 2) figure out what the &amp thing is about
 
 # To login to my bot's twitter account
 
@@ -95,8 +95,15 @@ def generate_message(chain, trendsNames) :
         word2 = random.choice(chain[word1])
         word1 = word2
         message += ' ' + word2
+
     # add a random trending hashtag to the end of the tweet
     message += ' ' + trendsNames[i]
+
+    # Sometimes, an emoji in twitter isn't detected by the emoji filter when the tweets all first compile.
+    # It appears in the message as '&amp'... so let's take care of it
+    print(len(message))
+    if '&amp' in message or len(message) > 140:
+        generate_message(chain, trendsNames)
 
     return message
 
@@ -156,6 +163,7 @@ def run_bot(twitter) :
     # Tweet out the resulting Markov chain!
 
     twitter.update_status(message)
+
     print('Sleeping for one hour...')
     # Bot will tweet once every hour (3,600 seconds)
     time.sleep(60*20)
