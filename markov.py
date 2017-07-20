@@ -41,13 +41,6 @@ class MyStreamListener(tweepy.StreamListener):
 def authenticate_twitter() :
     print('Authenticating twitter account...')
 
-<<<<<<< HEAD
-=======
-    consumer_key = 'is secret shh'
-    consumer_secret = 'is secret shh'
-    access_token = 'is secret shh'
-    access_token_secret = 'is secret shh'
->>>>>>> b34648d9d1eee6a48fed830ea76cb1f0f77d07e8
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
 
@@ -127,7 +120,7 @@ def generate_message(chain, chosen_trend) :
 
     # Sometimes, an emoji in twitter isn't detected by the emoji filter when the tweets all first compile.
     # It appears in the message as '&amp'... so call generate_message() again until there isn't one in there
-    print('Message length: ' + len(message))
+    print('Message length: ' + str(len(message)))
 
     if '&amp' in message or len(message) > 140:
         return generate_message(chain, chosen_trend)
