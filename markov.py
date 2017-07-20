@@ -41,6 +41,13 @@ class MyStreamListener(tweepy.StreamListener):
 def authenticate_twitter() :
     print('Authenticating twitter account...')
 
+<<<<<<< HEAD
+=======
+    consumer_key = 'is secret shh'
+    consumer_secret = 'is secret shh'
+    access_token = 'is secret shh'
+    access_token_secret = 'is secret shh'
+>>>>>>> b34648d9d1eee6a48fed830ea76cb1f0f77d07e8
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
 
