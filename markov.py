@@ -8,6 +8,7 @@ import time
 import random
 import langid
 import language_check
+from collections import Counter
 
 # Four basic steps to the program
 # 1) Read the source text
@@ -16,6 +17,11 @@ import language_check
 # 4) Output the phrase
 
 # To login to my bot's twitter account
+
+# TODO -- instead of picking just the top occurring value, get the most popular values and
+# TODO -- randomly choose one of them
+# TODO -- prevent Spanish words like que and la from being valid words
+# TODO -- add a period if the tweet is done
 
 
 class MyStreamListener(tweepy.StreamListener):
@@ -41,13 +47,6 @@ class MyStreamListener(tweepy.StreamListener):
 def authenticate_twitter() :
     print('Authenticating twitter account...')
 
-<<<<<<< HEAD
-=======
-    consumer_key = 'is secret shh'
-    consumer_secret = 'is secret shh'
-    access_token = 'is secret shh'
-    access_token_secret = 'is secret shh'
->>>>>>> b34648d9d1eee6a48fed830ea76cb1f0f77d07e8
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
 
@@ -83,6 +82,7 @@ def generate_chain(text, chain={}) :
 
         index += 1
 
+    print(chain)
     return chain
 
 
@@ -98,11 +98,39 @@ def generate_message(chain, chosen_trend) :
     word1 = random.choice(list(chain.keys()))
 
     # The message will initially be just the chosen word, but capitalized
-    message = word1.capitalize()
+    # If a link is chosen for word1, start the message over again
+    if 'http' in word1 :
+        return generate_message(chain, chosen_trend)
+    else :
+        message = word1.capitalize()
+    print('First word: ' + message)
 
     # while the length of message doesn't exceed 140 chars, keep adding words that follow the Markov chain
     while len(message) < char_limit :
+
         word2 = random.choice(chain[word1])
+
+        # if word1 has multiple occurances of the same value (e.g. 'set': ['of', 'of', 'down', 'off', 'of']), then
+        # select the value with the most occurances ('of')
+        for key, values in chain.items() :
+            if key == message.split(' ')[len(message.split(' '))-1] :
+                print('Key: ' + key + '\nValue list: ' + str(values))
+
+                # Find the mode
+                data = Counter(values)
+                potential_word2 = data.most_common(1)[0][0]
+
+                # prevent repeats
+                if potential_word2 not in message :
+                    word2 = str(potential_word2)
+                    print('Most common word: ' + word2)
+
+                # if the word is a repeat, just set it to a random value of the key
+                else :
+                    word2 = random.choice(chain[word1])
+                    print('\'' + potential_word2 + '\' was a repeat; another random word has been chosen')
+
+        print('Chosen word: ' + word2)
 
         # check if the words are English
         if is_english(word2) :
@@ -111,8 +139,8 @@ def generate_message(chain, chosen_trend) :
 
         else :
             # if is_english() keeps returning false because a non-English word only has one value,
-            # assign a different key to word1
-            word1 = random.choice(list(chain.keys()))
+            # restart the message
+            return generate_message(chain, chosen_trend)
 
         print(message)
 
@@ -127,7 +155,7 @@ def generate_message(chain, chosen_trend) :
 
     # Sometimes, an emoji in twitter isn't detected by the emoji filter when the tweets all first compile.
     # It appears in the message as '&amp'... so call generate_message() again until there isn't one in there
-    print('Message length: ' + len(message))
+    print('Message length: ' + str(len(message)))
 
     if '&amp' in message or len(message) > 140:
         return generate_message(chain, chosen_trend)
@@ -156,7 +184,7 @@ def is_english(word) :
         return True
 
     else:
-        print('Not English...')
+        print('Not English... Regenerate message!')
         return False
 
 
