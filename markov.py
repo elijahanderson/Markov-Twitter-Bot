@@ -44,11 +44,12 @@ class MyStreamListener(tweepy.StreamListener) :
         # Emojis can't be encoded into .txt file, so only accept tweets without them
         try :
             print(status.text)
-            status.text.encode('utf-8', 'strict')
             file = open('tweets.txt', 'a')
             file.write(status.text + '\n')
         except UnicodeError :
             print('Tweet contained non UTF-8 chars; discarded.')
+        except Exception :
+            print('Tweet raised some other exception; discarded.')
 
 
 # To "log in" to bot's twitter account
@@ -56,6 +57,8 @@ class MyStreamListener(tweepy.StreamListener) :
 
 def authenticate_twitter() :
     print('Authenticating twitter account...')
+
+    
 
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
@@ -140,7 +143,7 @@ def generate_message(chain, chosen_trend) :
             word1 = key
     print('First word followed by its two appropriate keys: ' + str(word1))
 
-    # Check if all three words are English (only check the first one before)
+    # Check if all three words are English (only checked the first one before)
     if is_english(word1.lower()) :
         message = word1.capitalize()
     else :
@@ -174,9 +177,18 @@ def generate_message(chain, chosen_trend) :
                 if potential_word2 not in message :
                     word2 = str(potential_word2)
                     print('Most common word: ' + word2)
-                elif '&amp' in potential_word2 :
-                    word2 = random.choice(chain[word1])
-                    print('\'' + potential_word2 + '\' was \'amp\'; another random word has been chosen')
+                # if the new word is a repeat or some other erroneous word, set the new word to the chosen trend or
+                # just a different word
+                elif '&amp' in potential_word2 or potential_word2 in message:
+
+                    i = random.randint(0,5)
+                    # 1 in 6 chance to choose the trend
+                    if i % 5 == 0 :
+                        word2 = chosen_trend
+                    # 33% chance to choose some other random word
+                    else :
+                        word2 = random.choice(chain[word1])
+                    print('\'' + potential_word2 + '\' was invalid; ' + word2 + ' has been chosen instead')
                 # if the word is a repeat, just set it to a random value of the key
                 else :
                     word2 = random.choice(chain[word1])
@@ -199,8 +211,9 @@ def generate_message(chain, chosen_trend) :
 
         print('Message: ' + message)
 
-    # add the chosen trend to the end of the tweet
-    message += ' ' + chosen_trend
+    # add the chosen trend to the end of the tweet if it's not already in there
+    if chosen_trend not in message :
+        message += ' ' + chosen_trend
 
     # Fix any grammatical errors if possible (Also occasionally fixes some foreign words)
     tool = language_check.LanguageTool('en-US')
@@ -208,10 +221,9 @@ def generate_message(chain, chosen_trend) :
     message = language_check.correct(message, matches)
     print('Grammarized message: ' + message)
 
-    # Sometimes, an emoji in twitter isn't detected by the emoji filter when the tweets all first compile.
-    # It appears in the message as '&amp'... so call generate_message() again until there isn't one in there
     print('Message length: ' + str(len(message)))
 
+    # If, for whatever reason, the final tweet exceeds twitter's char limit, generate a new message
     if len(message) > 140 :
         print('Length of message exceeded twitter\'s char limit... Regenerating!')
         return generate_message(chain, chosen_trend)
@@ -268,13 +280,12 @@ def run_bot(twitter) :
     print('\nThe trending hashtags: \n')
     print(names)
 
-    # Go through a large amount of tweets from all users using a stream listener ######################
+    # Go through a large amount of tweets from all users using a stream listener                      #
     #                                                                                                 #
     # ----------------------------------- STREAMING METHOD ------------------------------------------ #
     #                                                                                                 #
     # although there are several trending hashtags, the bot will choose one and use all of the tweets #
     # that include it                                                                                 #
-    ###################################################################################################
 
     # get a random trending hashtag
     # check if they're in english by splitting them by capital letters
@@ -297,7 +308,7 @@ def run_bot(twitter) :
 
     # However many seconds the program sleeps will determine how long the stream continues for
     # I use five minutes to get a TON of tweets, so I can build a good chain
-    time.sleep(60*25)
+    time.sleep(60*15)
     my_stream.disconnect()
 
     tweets = ''
@@ -318,7 +329,7 @@ def run_bot(twitter) :
 
     print('Sleeping for about thirty minutes...')
     # Bot will tweet once every 30 minutes or so while running
-    time.sleep(60*5)
+    time.sleep(60*15)
 
 twitter = authenticate_twitter()
 

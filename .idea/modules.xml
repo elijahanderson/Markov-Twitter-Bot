@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../../DPUDS/DPUDS_Projects/Fall_2017/MNIST/.idea/MNIST.iml" filepath="$PROJECT_DIR$/../../DPUDS/DPUDS_Projects/Fall_2017/MNIST/.idea/MNIST.iml" />
+      <module fileurl="file://D:\Programming\Python\Python Programs\DPUDS_Projects\Fall_2017\MNIST\.idea\MNIST.iml" filepath="D:\Programming\Python\Python Programs\DPUDS_Projects\Fall_2017\MNIST\.idea\MNIST.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/Markov-Twitter-Bot.iml" filepath="$PROJECT_DIR$/.idea/Markov-Twitter-Bot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../Python-Practice/.idea/Python-Practice.iml" filepath="$PROJECT_DIR$/../../Python-Practice/.idea/Python-Practice.iml" />
     </modules>
   </component>
 </project>
