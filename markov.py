@@ -7,10 +7,10 @@ import tweepy
 import time
 import random
 import langid
-import language_check
 from collections import Counter
 from textblob import TextBlob
 import re
+import urllib3
 
 # Four basic steps to the program
 # 1) Read the source text
@@ -34,7 +34,8 @@ valid_words = ['still', 'want', 'because', 'by putting different', 'mommies', 'm
                'because we don\'t', 'models', 'than getting you', 'outside', 'me after eating', 'crises',
                'still being decisive', 'being', 'articuno', 'kitchen', 'i felt your', 'i cant stress', 'so nice to',
                'paris', 'spent', 'thrive', 'phone', 'toddler', 'rules', 'young', 'ghostwriter', 'after being spotted',
-               'amazing', 'wanna', 'while you gain', 'seen', 'yesterday', 'wednesday wisdom']
+               'amazing', 'wanna', 'while you gain', 'seen', 'yesterday', 'wednesday wisdom', 'considered', 'lawd',
+               'i\'m']
 
 class MyStreamListener(tweepy.StreamListener) :
 
@@ -48,7 +49,7 @@ class MyStreamListener(tweepy.StreamListener) :
             file.write(status.text + '\n')
         except UnicodeError :
             print('Tweet contained non UTF-8 chars; discarded.')
-        except Exception :
+        except urllib3.exceptions :
             print('Tweet raised some other exception; discarded.')
 
 
@@ -58,7 +59,6 @@ class MyStreamListener(tweepy.StreamListener) :
 def authenticate_twitter() :
     print('Authenticating twitter account...')
 
-    
 
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
@@ -108,7 +108,7 @@ def generate_chain(text, chain={}) :
 def generate_message(chain, chosen_trend) :
 
     print('GENERATING MESSAGE!!')
-    char_limit = 140 - (len(chosen_trend)+5)
+    char_limit = 280 - (len(chosen_trend)+5)
 
     # To find the most common elements, a Counter object is used
     # turn the dict object returned by chain.key() into list with three word elements, turn that into a string split
@@ -197,7 +197,7 @@ def generate_message(chain, chosen_trend) :
         print('Chosen word: ' + word2)
 
         # check if the words are English
-        if is_english(word2.lower()):
+        if word2 == chosen_trend or is_english(word2.lower()):
             word1 = word2
             message += ' ' + word2
         # if is_english() keeps returning false because a non-English word only has one value,
@@ -205,8 +205,10 @@ def generate_message(chain, chosen_trend) :
         else :
             print('Not English... Regenerating message!')
             return generate_message(chain, chosen_trend)
+
+        i = random.randint(0, 3)
         # if the word ends with a period and the char count is past 100, end the tweet there.
-        if ('.' in word2 or '?' in word2 or '!' in word2) and len(message) >= 100 :
+        if ('.' in word2 or '?' in word2 or '!' in word2) and len(message) >= 10 and i == 0 :
             break
 
         print('Message: ' + message)
@@ -215,16 +217,10 @@ def generate_message(chain, chosen_trend) :
     if chosen_trend not in message :
         message += ' ' + chosen_trend
 
-    # Fix any grammatical errors if possible (Also occasionally fixes some foreign words)
-    tool = language_check.LanguageTool('en-US')
-    matches = tool.check(message)
-    message = language_check.correct(message, matches)
-    print('Grammarized message: ' + message)
-
     print('Message length: ' + str(len(message)))
 
     # If, for whatever reason, the final tweet exceeds twitter's char limit, generate a new message
-    if len(message) > 140 :
+    if len(message) > char_limit :
         print('Length of message exceeded twitter\'s char limit... Regenerating!')
         return generate_message(chain, chosen_trend)
     else :
