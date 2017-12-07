@@ -1,4 +1,4 @@
-# Markov Twitter Bot
+# Markov Twitter Bot -- by Eli Anderson
 
 # This bot will imitate a Twitter user. To do this, it will look at discussions around trending hashtags, create a
 # Markov chain based on those discussions, then send out various (semi-coherent) tweets based on the Markov chain.
@@ -10,7 +10,6 @@ import langid
 from collections import Counter
 from textblob import TextBlob
 import re
-import urllib3
 
 # Four basic steps to the program
 # 1) Read the source text
@@ -35,7 +34,7 @@ valid_words = ['still', 'want', 'because', 'by putting different', 'mommies', 'm
                'still being decisive', 'being', 'articuno', 'kitchen', 'i felt your', 'i cant stress', 'so nice to',
                'paris', 'spent', 'thrive', 'phone', 'toddler', 'rules', 'young', 'ghostwriter', 'after being spotted',
                'amazing', 'wanna', 'while you gain', 'seen', 'yesterday', 'wednesday wisdom', 'considered', 'lawd',
-               'i\'m']
+               'i\'m', 'wanna play', 'play']
 
 class MyStreamListener(tweepy.StreamListener) :
 
@@ -46,10 +45,10 @@ class MyStreamListener(tweepy.StreamListener) :
         try :
             print(status.text)
             file = open('tweets.txt', 'a')
-            file.write(status.text + '\n')
+            file.write(status.text.replace('\n', '. ') + '\n')
         except UnicodeError :
             print('Tweet contained non UTF-8 chars; discarded.')
-        except urllib3.exceptions :
+        except :
             print('Tweet raised some other exception; discarded.')
 
 
@@ -58,7 +57,6 @@ class MyStreamListener(tweepy.StreamListener) :
 
 def authenticate_twitter() :
     print('Authenticating twitter account...')
-
 
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
@@ -181,11 +179,11 @@ def generate_message(chain, chosen_trend) :
                 # just a different word
                 elif '&amp' in potential_word2 or potential_word2 in message:
 
-                    i = random.randint(0,5)
-                    # 1 in 6 chance to choose the trend
-                    if i % 5 == 0 :
+                    i = random.randint(0,2)
+                    # 1 in 3 chance to choose the trend
+                    if i == 0 :
                         word2 = chosen_trend
-                    # 33% chance to choose some other random word
+                    # 66% chance to choose some other random word
                     else :
                         word2 = random.choice(chain[word1])
                     print('\'' + potential_word2 + '\' was invalid; ' + word2 + ' has been chosen instead')
@@ -220,7 +218,7 @@ def generate_message(chain, chosen_trend) :
     print('Message length: ' + str(len(message)))
 
     # If, for whatever reason, the final tweet exceeds twitter's char limit, generate a new message
-    if len(message) > char_limit :
+    if len(message) > char_limit or '&amp;' in message:
         print('Length of message exceeded twitter\'s char limit... Regenerating!')
         return generate_message(chain, chosen_trend)
     else :

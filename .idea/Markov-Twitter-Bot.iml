@@ -6,7 +6,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="Python-Practice" />
     <orderEntry type="module" module-name="Reddit-User-Simulator" />
-    <orderEntry type="module" module-name="Reddit-Bot" />
   </component>
   <component name="TestRunnerService">
     <option name="PROJECT_TEST_RUNNER" value="Unittests" />
