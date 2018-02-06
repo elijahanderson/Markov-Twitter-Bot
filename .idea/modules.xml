@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/Markov-Twitter-Bot.iml" filepath="$PROJECT_DIR$/.idea/Markov-Twitter-Bot.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../Python-Practice/.idea/Python-Practice.iml" filepath="$PROJECT_DIR$/../../Python-Practice/.idea/Python-Practice.iml" />
       <module fileurl="file://$PROJECT_DIR$/../Reddit-User-Simulator/.idea/Reddit-User-Simulator.iml" filepath="$PROJECT_DIR$/../Reddit-User-Simulator/.idea/Reddit-User-Simulator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../Spotify-Playlist-Generator/.idea/Spotify-Playlist-Generator.iml" filepath="$PROJECT_DIR$/../Spotify-Playlist-Generator/.idea/Spotify-Playlist-Generator.iml" />
     </modules>
   </component>
 </project>

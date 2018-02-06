@@ -58,6 +58,11 @@ class MyStreamListener(tweepy.StreamListener) :
 def authenticate_twitter() :
     print('Authenticating twitter account...')
 
+    consumer_key = 'et15kbW3TtzBnTMzNsE7mq5Gq'
+    consumer_secret = 'Wvy37dhPmi7fSILLBs8NckoQIkqvd9kZDi3r8knraCchg3MaJB'
+    access_token = '701887784303198208-yaavhf9uMWvMMLcgKmU7HuG8nxPMl4A'
+    access_token_secret = 'll9kaljQ1O30zAhGQxFUAgcX1cNKQpxwYKAoYjEn5bRnm'
+
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
 
@@ -86,11 +91,12 @@ def generate_chain(text, chain={}) :
         key = words[index-1] + ' ' + words[index]
 
         # If a word's key (the previous word) is already in the chain, add word_value to the value list
-        if key in chain :
+        # also, disregard potential words with an endline character, they can mess up the sentence structure
+        if key in chain and '\n' not in word_value:
             chain[key].append(word_value)
 
         # if the key isn't already in the chain, create a value list
-        else :
+        elif '\n' not in word_value :
             chain[key] = [word_value]
 
         index += 1
@@ -301,7 +307,7 @@ def run_bot(twitter) :
                                                          -124.90, 23.92, -66.37, 50.08])
 
     # However many seconds the program sleeps will determine how long the stream continues for
-    # I use five minutes to get a TON of tweets, so I can build a good chain
+    # I use 15 minutes to get a TON of tweets, so I can build a good chain
     time.sleep(60*15)
     my_stream.disconnect()
 

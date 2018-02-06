@@ -5,6 +5,7 @@
     <mapping directory="$PROJECT_DIR$/../../DeepLearningPython35" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../Reddit-Bot" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../Reddit-User-Simulator" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Spotify-Playlist-Generator" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../../Xtern-Data-Science-Screen" vcs="Git" />
   </component>
 </project>
