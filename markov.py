@@ -58,10 +58,6 @@ class MyStreamListener(tweepy.StreamListener) :
 def authenticate_twitter() :
     print('Authenticating twitter account...')
 
-    consumer_key = 'et15kbW3TtzBnTMzNsE7mq5Gq'
-    consumer_secret = 'Wvy37dhPmi7fSILLBs8NckoQIkqvd9kZDi3r8knraCchg3MaJB'
-    access_token = '701887784303198208-yaavhf9uMWvMMLcgKmU7HuG8nxPMl4A'
-    access_token_secret = 'll9kaljQ1O30zAhGQxFUAgcX1cNKQpxwYKAoYjEn5bRnm'
 
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
@@ -210,7 +206,7 @@ def generate_message(chain, chosen_trend) :
             print('Not English... Regenerating message!')
             return generate_message(chain, chosen_trend)
 
-        i = random.randint(0, 3)
+        i = random.randint(0, 4)
         # if the word ends with a period and the char count is past 100, end the tweet there.
         if ('.' in word2 or '?' in word2 or '!' in word2) and len(message) >= 10 and i == 0 :
             break
@@ -316,7 +312,7 @@ def run_bot(twitter) :
     with open('tweets.txt', 'r') as file :
         tweets = file.read()
 
-    # Generate the Markov chain
+    # Generate the Markov chai
     chain = generate_chain(tweets)
 
     # Generate the message using the chain
