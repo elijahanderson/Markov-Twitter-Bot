@@ -327,6 +327,7 @@ def run_bot(twitter) :
     # Bot will tweet once every 30 minutes or so while running
     time.sleep(60*15)
 
+# Authenticate the bot account (this comment should only show up in the gitpractice branch)
 twitter = authenticate_twitter()
 
 # Run the bot -- cancel whenever you please
