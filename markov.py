@@ -329,5 +329,6 @@ def run_bot(twitter) :
 
 twitter = authenticate_twitter()
 
+# Run the bot -- cancel whenever you please
 while True :
-    run_bot(twitter)
+    run_bot(twitter) 
